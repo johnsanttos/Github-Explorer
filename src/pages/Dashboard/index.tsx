@@ -2,7 +2,7 @@ import React, { useState, FormEvent } from 'react'
 import { FiChevronRight } from 'react-icons/fi'
 import api from '../../services/api'
 import logoImg from '../../assets/logo.svg'
-import { Title, Form, Repositories } from './styles'
+import { Title, Form, Repositories,Error } from './styles'
 import Repository from '../Repository';
 
 
@@ -22,6 +22,7 @@ const Dashboard: React.FC = () => {
 
     const [newRepo, setNewRepo] = useState('')
     //temos que tipar todo o estado que nao for padrão, temos que tipar de array e objetos 
+    const [inputError, setInputError] = useState('')
     const [repositories, setRepositories] = useState <Repository []>([])
 
     async function handleAddRepository(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -30,15 +31,25 @@ const Dashboard: React.FC = () => {
         // Adição de um novo repositorio
         // consumir API do Github
         // salvar novo repositorio no estado
+        if (!newRepo) {
+            setInputError ('Digite o ator/nome do repositório');
+            return;
+        }
 
-        const response = await api.get(`repos/${newRepo}`);
+      try {
+        const response = await api.get <Repository>(`repos/${newRepo}`);
         // console.log(response.data)
         const repository = response.data
 
-        console.log ( 'meu pauu' , repository)
+        console.log ( 'resultado' , repository)
 
         setRepositories([...repositories, repository])
         setNewRepo ('')
+        setInputError('')
+      }
+      catch (err) {
+        setInputError ('Erro na busca do repositório')
+      }
 
     }
 
@@ -47,7 +58,9 @@ const Dashboard: React.FC = () => {
             <img src={logoImg} alt="Github Explorer" />
             <Title>Explore repositórios no Github</Title>
 
-            <Form onSubmit={handleAddRepository}>
+            <Form 
+            hasError={!!inputError}
+            onSubmit={handleAddRepository}>
 
                 <input
                     value={newRepo}
@@ -57,7 +70,7 @@ const Dashboard: React.FC = () => {
                 <button type="submit"> Pesquisar </button>
             </Form>
 
-           
+           {inputError && <Error> {inputError} </Error> }
 
             <Repositories>
                {repositories.map (repository =>(
