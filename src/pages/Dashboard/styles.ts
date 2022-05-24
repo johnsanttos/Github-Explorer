@@ -22,6 +22,8 @@ max-width: 700px;
 display: flex;
 input {
     flex:1;
+    font-size: 18px;
+    font-weight: bold;
     padding: 0 24px;
     border: 0;
     border-radius: 5px 0 0 5px;
